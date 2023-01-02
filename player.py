@@ -38,11 +38,19 @@ class Player:
     
     def selectProperty(self, p):
         """Player selects a property then own"""
-        if p not in self.properties:
-            raise Exception("Player does not have this property")
-        else:
-            p_idx = self.properties.index(p)
-            return self.properties.pop(p_idx)
+        print("Player({}), Time to put up a property.".format(self.name))
+        print("Here are your properties: {}".format(self.properties))
+        while True:
+            try:
+                property = int(input('Place a Property: '))
+                if property not in self.properties:
+                    raise ValueError
+                break
+            except:
+                print('Please choose a property that you have: {}'.format(self.properties))
+        
+        self.properties.remove(property)
+        return property
 
     def addCoins(self, c):
         """"Give the player c coins"""

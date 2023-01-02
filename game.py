@@ -1,3 +1,7 @@
+import board
+import deck
+import player
+
 
 while True:
     # initialize game

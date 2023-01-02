@@ -9,8 +9,8 @@ class Board:
         self.properties = HouseDeck()
         self.checks = CheckDeck()
         self.num_players = num_players
-    
-    def displayCards(self, cards, card_type='house'):
+        
+    def displayCards(cards, card_type='house'):
         """prints cards to terminal"""
         if card_type == 'house':
             suit = '🏠'
@@ -39,13 +39,13 @@ class Board:
             result.append(''.join(lines[index]))
         print('\n'.join(result))
 
-    def bidRound(self):
+    def buyRound(self, starting_player=0):
         """
         Property cards are selected and players place bids on those properties.
         """
         property_cards = self.properties.deal(self.num_players)
         players_out_round = [0] * self.num_players
-        curr_player = 0
+        curr_player = starting_player
         bids = [0] * self.num_players
         # loop until only 1 player left
         while sum(players_out_round) != self.num_players - 1:
@@ -65,15 +65,28 @@ class Board:
             while True:
                 curr_player = (curr_player + 1) % self.num_players
                 if not players_out_round[curr_player]: 
-                    break 
-            
-            print(curr_player)
-            print(players_out_round)
+                    break
              
         # last player gets the last property and no coins back
         self.player_dict[curr_player].addProperty(property_cards.pop(-1))
         self.player_dict[curr_player].addCoins(-1 * bids[curr_player])
+        
+        return curr_player
     
+    def sellRound(self):
+        """
+        Check cards are displayed and players decide which property to put up to be sold
+        """
+        check_cards = self.checks.deal()
+        properties = []
+        for i in range(self.num_players):
+            properties.append(self.player_dict[i].placeProperty())
+        
+        # returns a sorted player indexes in order of what property each player gets
+        sorted_idxs = [i[0] for i in sorted(enumerate(properties), key=lambda x:x[1], reverse=True)]
+        for player_idx in sorted_idxs:
+            self.player_dict[player_idx].addCoins(check_cards.pop())
+
     def displayBoardState(self):
         for i, player in self.player_dict.items():
             print("Player {} has {} coins and following properties:".format(i, player.coins))
